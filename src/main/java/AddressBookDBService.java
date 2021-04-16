@@ -113,4 +113,16 @@ public class AddressBookDBService {
         return this.getPersonDataUsingDB(sql);
     }
 
+    public List<AddressBookData> getCountByState(String state) {
+        List<AddressBookData> addressBookDataList = new ArrayList<>();
+        String sql = String.format("SELECT * FROM address_book where state = '%s';", state);
+        try (Connection connection = this.getConnection()){
+            Statement statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery(sql);
+            addressBookDataList = this.getPersonData(resultSet);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return addressBookDataList;
     }
+}

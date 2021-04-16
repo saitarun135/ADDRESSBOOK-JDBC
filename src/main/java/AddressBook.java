@@ -4,6 +4,10 @@ import java.util.List;
 
 public class AddressBook {
 
+    public List<AddressBookData> countByState(String state) {
+        return addressBookDBService.getCountByState(state);
+    }
+
     public enum IOService {
         DB_IO
     }
