@@ -4,6 +4,9 @@ import java.util.List;
 
 public class AddressBook {
 
+    public List<AddressBookData> countByCity(String city) {
+        return addressBookDBService.getCount(city);
+    }
     public List<AddressBookData> countByState(String state) {
         return addressBookDBService.getCountByState(state);
     }
