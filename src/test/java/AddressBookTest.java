@@ -45,5 +45,14 @@ public class AddressBookTest {
         List<AddressBookData>  addressBookDataList = addressBook.countByCity("ongole");
         Assert.assertEquals(1, addressBookDataList.size());
     }
+    @Test
+    public void givenNewContactData_WhenAdded_ShouldSyncWithDB() throws SQLException {
+        addressBook = new AddressBook();
+        addressBookDataList = addressBook.readAddressBookData(AddressBook.IOService.DB_IO);
+        addressBook.addContactToAddressBook(3,"aksha","sai","srnagar","Hyderabad","TN",5230,"958","saiaksh@in");
+        boolean result = addressBook.checkAddressBookInSyncWithDB("aksha");
+        System.out.println("new contact added in Database");
+        Assert.assertTrue(result);
+    }
 }
 

@@ -109,7 +109,8 @@ public class AddressBookDBService {
     }
 
     public List<AddressBookData> getPersonDataForDateRange(LocalDate startDate, LocalDate endDate) {
-        String sql = String.format("SELECT * FROM address_book WHERE START BETWEEN '%s' AND '%s';", Date.valueOf(startDate), Date.valueOf(endDate));
+        String sql = String.format("SELECT * FROM address_book WHERE START BETWEEN '%s' AND '%s';",
+                                    Date.valueOf(startDate), Date.valueOf(endDate));
         return this.getPersonDataUsingDB(sql);
     }
     public List<AddressBookData> getCount(String city) {
@@ -136,5 +137,24 @@ public class AddressBookDBService {
             e.printStackTrace();
         }
         return addressBookDataList;
+    }
+    public AddressBookData addContact(int id,String firstName, String lastName, String address, String city, String state, int zip,
+                                      int phone, String email) {
+        int contactId = -1;
+        AddressBookData addressBookData = null;
+        String sql = String.format("INSERT INTO Address_Book (id,firstName, lastName, address, city, state, zip, phoneNumber, email)" +
+                "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')", id,firstName, lastName, address, city, state, zip, phone, email);
+        try (Connection connection = this.getConnection()) {
+            Statement statement = connection.createStatement();
+            int rowAffected = statement.executeUpdate(sql, statement.RETURN_GENERATED_KEYS);
+            if (rowAffected == 1) {
+                ResultSet resultSet = statement.getGeneratedKeys();
+                if (resultSet.next()) contactId = resultSet.getInt(1);
+            }
+            addressBookData = new AddressBookData(id, firstName, lastName, address, city, state, zip, phone, email);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return addressBookData;
     }
 }
