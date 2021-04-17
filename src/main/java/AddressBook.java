@@ -1,6 +1,8 @@
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class AddressBook {
 
@@ -49,5 +51,42 @@ public class AddressBook {
     }
     public void addContactToAddressBook(int id,String firstName, String lastName, String address, String city, String state, int zip, String phone, String email) {
         addressBookList.add(addressBookDBService.addContact(id,firstName, lastName, address, city, state, zip, Integer.parseInt(phone), email));
+    }
+    public void addContactToAddressBook(String firstName, String lastName, String address, String city, String state, int zip, String phoneNumber, String email) {
+        addressBookList.add(addressBookDBService.addContact(firstName, lastName, address, city, state, zip, phoneNumber, email));
+    }
+    public void addContactIntoDB(List<AddressBookData> addressBookDataList) {
+        addressBookDataList.forEach(data -> {
+            this.addContactToAddressBook(data.firstName, data.lastName, data.address, data.city, data.state, data.zip, String.valueOf(data.phone), data.email);
+        });
+    }
+    public void addAddressBookDataWithThread(List<AddressBookData> addressBookDataList) {
+        Map<Integer, Boolean> contactAdditionStatus = new HashMap<Integer, Boolean>();
+        addressBookDataList.forEach(data -> {
+            Runnable task = () -> {
+                contactAdditionStatus.put(data.hashCode(), false);
+                System.out.println("Contact is Being Added: " + Thread.currentThread().getName());
+                this.addContactToAddressBook(data.firstName, data.lastName, data.address, data.city, data.state, data.zip, String.valueOf(data.phone), data.email);
+                contactAdditionStatus.put(data.hashCode(), true);
+                System.out.println("Employee Added: " + Thread.currentThread().getName());
+            };
+            Thread thread = new Thread(task, data.firstName);
+            thread.setPriority(10);
+            thread.start();
+        });
+        while (contactAdditionStatus.containsValue(false)) {
+            try {
+                Thread.sleep(10);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        System.out.println(this.addressBookList);
+    }
+
+    public long countEntries(IOService ioService) {
+        if (ioService.equals(IOService.DB_IO))
+            return this.addressBookList.size();
+        return 0;
     }
 }

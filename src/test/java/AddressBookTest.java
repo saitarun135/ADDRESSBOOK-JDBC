@@ -1,5 +1,8 @@
 import java.sql.SQLException;
+import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
@@ -53,6 +56,27 @@ public class AddressBookTest {
         boolean result = addressBook.checkAddressBookInSyncWithDB("aksha");
         System.out.println("new contact added in Database");
         Assert.assertTrue(result);
+    }
+    @Test
+    public void given6Employees_WhenAdded_Should_ShouldMatchEmpEntries() throws SQLException {
+        AddressBookData[] arrayOfContacts = {
+                new AddressBookData(0, "vishnu", "vardhan", "Sai Nagar","Bangalore", "karnataka", 789654,
+                        7534125, "vishnue@gm.com"),
+                new AddressBookData(0, "Apurva", "sai", "Keshav Nagar","Pune", "MH", 969654,
+                        972431556, "apue@gmail.com"),
+
+        };
+        AddressBook addressBook = new AddressBook();
+        addressBook.readAddressBookData(AddressBook.IOService.DB_IO);
+        Instant start = Instant.now();
+        addressBook.addContactIntoDB(Arrays.asList(arrayOfContacts));
+        Instant end = Instant.now();
+        System.out.println("Duration without Thread: " + Duration.between(start, end));
+        Instant threadStart = Instant.now();
+        addressBook.addAddressBookDataWithThread(Arrays.asList(arrayOfContacts));
+        Instant threadEnd = Instant.now();
+        System.out.println("Duration with thread: " + Duration.between(threadStart, threadEnd));
+        Assert.assertEquals(5, addressBook.countEntries(AddressBook.IOService.DB_IO));
     }
 }
 
